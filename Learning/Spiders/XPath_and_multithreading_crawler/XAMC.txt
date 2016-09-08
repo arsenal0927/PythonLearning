@@ -1,0 +1,58 @@
+XPath与多线程爬虫
+    XPath的介绍与配置
+        XPath是什么
+            XPath是一门语言
+            XPath可一在XML文档中查找信息
+            XPath支持HTML
+            XPath通过元素和属性进行导航
+            XPAth可一用来提取信息
+            XPath比正则表达式厉害
+            XPath比正则表达式简单
+        如何安装使用XPath
+            安装第三方库--lxml库
+            导入：from lxml import etree
+            方法：Selector = etree.HTML(网页源代码)
+            方法：Selector.xpath(一段神奇的符号)
+    XPath的使用
+        XPath与HTML结构
+            树状结构
+            逐层展开
+            逐层定位
+            寻找独立节点
+        获取网页元素的Xpath
+            手动分析
+            Chrome生成
+        应用XPath提取内容
+            //定位根节点
+            /往下层寻找
+            提取文本内容：/text（）
+            提取属性内容：/@xxxx
+    XPath的特殊用法
+        以相同的字符开头
+            start-with（@属性名称，属性字符相同部分）
+                <div id="test-1">内容1</div>
+                <div id="test-1">内容2</div>
+                <div id="testfault">内容3</div>
+        标签套标签
+            string(.)
+                <div id="class3">美女，
+                    <font color=red>啦啦啦</font>
+                </div>
+    Python并行化介绍与演示
+        Python的并行化介绍
+            多个线程同时处理任务
+            高效
+            快速
+        Map的使用
+            map函数一首包办了序列操作、参数传递和结果保存等一系列的操作
+            from multiprocessing.dummy import Pool
+            pool = Poll(计算机处理器核数)
+            results = pool.map(爬取函数，网址列表)
+    实战--百度贴吧爬虫
+        目标网站：http://tieba.baidu.com/p/3522395718
+        目标内容：跟帖用户名，跟帖内容，跟帖时间
+        设计知识：
+            Requests获取网页源代码
+            XPath提取网页内容
+            map实现多线程爬虫
+            EX_XAMC04.py

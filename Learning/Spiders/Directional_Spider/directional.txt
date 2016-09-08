@@ -1,0 +1,216 @@
+简单的模拟登陆
+    抓包利器fiddler
+        电脑与互连网之间的通信是通过不同的数据包收发来实现的。fiddler可以从中间对数据进行拦截，拷贝一份数据以后在将数据发送给目的端
+        同类还有wireshark
+        与wireshark不同，fiddler只能抓取网页的数据包包，而wireshark可抓取的包更广泛
+        安装：一路下一步
+        配置：
+            WinConfig-》勾选ＩＥ－》浏览网页-》一点一拖看数据
+    Cookies与保持登陆
+        介绍Cookies
+            cookie，复数形态cookies，中文名称为小型文本文件或小甜饼
+            指某些网站为了辨别用户的身份而存储在用户本地终端（Client Side）上的数据（通常经过加密）
+            存在泄露个人隐私的风险
+        保持登陆机制
+            当登陆一个网站是，网站会请求用户输入用户名和密码，并且用户可以勾选“下次自动登陆”。
+            如果勾选了，那么下次访问同一网站时，用户就会发现没有输入用户名和密码就已经登陆了。
+            因为第一次登陆时，服务器发送量包含登陆凭据的cookies到用户的硬盘上。
+            第二次登陆就会发送该cookies，服务器验证凭据，于是不必输入用户名和密码。
+            这个Cookies会到期
+        Cookies的日常应用
+            通过修改Cookies可一获得网站的管理员权限。
+    Cookies模拟登陆
+        Fiddler获得Cookies
+            抓取登陆数据包
+            获取Cookies
+        Requests提交Cookies
+            cookie = {"Cookie": “XXXXXXXX”}
+            Html  = requests.get(url, cookies=cookie)
+    模拟登陆新浪微博
+        分析新浪微博登陆机制
+            输入用户名和密码
+            发送给服务器
+            服务器验证成功
+            返回Cookies与正常页面
+
+        分析需要提交的数据
+            Moblie 用户名
+            Password 密码
+            remember 是否保持登陆
+            backURL 登陆以后返回的地址
+            backTitle 登陆以后返回的标题
+            tryCount 尝试次数
+            vk 一个简单的验证码
+            submit 登陆
+            *action URL参数
+
+        Requests提交数据
+            data = {“mobile” : “XXXXXXXX”,     QBTTXPSE : “XXXX”,     ………….     }
+            Html  = requests.post(url, data=data)
+
+    实战--追女神助手V0.1
+        目标网站：新浪微博
+        目标内容：微博内容
+
+        目标流程：监控微博-》有更新-》转发到邮箱-》微信推送
+                监控微博-》无更新-》返回
+
+        更多功能：
+            爬取她的关注列表，从而分析她的社交关系网络
+            爬取她的全部微博内容，然后分析她的性格与爱好
+            微博中常出现的人物
+            。。。
+            。。。
+
+
+Scrapy初探
+    Scrapy介绍与安装
+        介绍：
+            Python开发的一个快速web爬虫抓取框架，用于抓取web站点并从页面中提取结构化的数据。
+            Scrapy用途广泛，可以用于数据挖掘、监测、自动化测试
+        安装：
+            zpoe.interface
+            Twisted
+            pyOpenSSL
+            pywin32
+            scrapy
+    Scrapy爬取网页
+        Scrapy生成Project
+            cmd下：scrapy startproject 项目名
+        爬取网页
+            import scrapy
+            from scrapy.contrib.spiders import CrawlSpider
+            from scrapy.http import Request
+            from scrapy.selector import Selector
+
+            项目名 = selector.xpath(xxxxxx).extract()
+    Scrapy文件结构
+        Project中的文件包括：
+            items.py
+                定义需要抓取并需要后期处理的数据
+            settings.py
+                配置Scrapy,从而修改user-agent,设定爬取时间的间隔，设置代理，配置各种中间件等等
+            pipelines.py
+                用于存放执行后期数据处理的功能，从而使得数据的爬取和处理分开
+    实战--豆瓣爬虫
+        目标网站：豆瓣电影TOP250
+        目标网址：http://movie.douban.com/top250
+        目标内容：
+            豆瓣电影TOP250中的250部电影，具体包括：
+                电影名称
+                电影信息
+                电影评分
+        输出结果：生成csv文件
+
+
+MongoDB与Scrapy
+    MongoDB介绍与安装
+        介绍：
+            是一个跨平台的非关系型数据库（NoSQL），基于Key-Value形式保存数据。
+            其存储格式非常类似于Python的字典，因此用Python操作MongoDB会非常容易
+        安装：
+            下载文件：http://www.mongodb.org/downloads
+            创建文件夹：mkdir data
+            执行命令：mongod --dbpath ./data
+        MongoDB的启动方法：
+            新建文件夹
+            批处理文件start.bat:
+                mongod --dbpath ./data
+                双击即可
+        可视化：
+            打开网址：http://www.mongovue.com/
+            下载MongoVUE
+            安装，运行
+    Python与MongoDB
+        pymongo的安装
+            python操作MongoDB的第三方库
+            核心命令：
+                pip install pymongo
+        Python操作MongoDB:
+            import pymongo
+            connection = pymongo.MongoClient()
+            tdb = connection.数据库名
+            post_info = tdb.test
+            post_infoinsert(xxx)#插入数据
+            post_info.remove(xxx)
+    Scrapy应用MongeDB
+        配置文件的编写
+            在settings.py中配置MongoDB的IP地址、端口号、数据记录名称，可以实现方便的更换MongoDB的数据库信息。
+            在settings.py中引用pipelines.py从而使pipelines生效。
+        pipelines的编写
+            在pipelines中可以像普通Python文件操作MongoDB一样编写代码处理需要保存到MongoDB的数据。
+            然而不同的是这里的数据来自items。
+            这样可以将数据的抓取和处理分开。
+    实战--小说爬虫
+        目标网站：盗墓笔记小说网站
+        目标网址：http://www.daomubiji.com/
+        目标内容：
+            小说信息：书标题、章节数、章标题、每一章的url
+        输出结果保存到MongoDB中。
+
+
+SCrapy与Redis入门
+    Redis的介绍与安装
+        介绍：
+            Redis是一个高性能的key-value数据库。
+            他将数据保存在内存中，因此可以实现非常快的存取速度。
+        安装scrapy-redis模块
+            第三方库的安装
+        安装与运行
+            http://www.redis.io/download
+            运行Redis:redis-server redis.conf
+            清空缓存：redis-cli flushdb
+    Scrapy配置Redis
+        settings.py配置Redis
+            前三行让Scrapy调用Redis
+            SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+            SCHEDULER_PERSIST = True
+            SCHEDULER_QUEUE_CLASS = scrapy_redis.queue.SpiderPriorityQueue'
+            REDIS_URL = None
+            下两行为Redis的信息
+            REDIS_HOST = '127.0.0.1'
+            REDIS_PORT = 6379
+        Spider调用Redis
+    实战--小说爬虫v0.2
+        目标网站：盗墓笔记小说网站
+        目标网址：http://www.daomubiji.com/
+        目标内容：
+            小说信息：书标题、章节数、章标题、每一章的url，每一章的正文
+        输出结果保存到MongoDB中。
+
+
+动态加载网页的爬取
+    AJAX的介绍与网页展示
+        AJAX的定义与介绍
+            即“Asyn Javascript And XML”(异步JavaScript和XML),是指义中创建交互式网页应用的网页开发技术
+            通过在后台与服务器进行少量的数据交换，AJAX可以使网页实现异步更新。
+            这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。
+        AJAX网页特点
+            页面加载速度快
+            不刷新网页就能更新信息
+            源代码内容与网页内容不同
+        AJAX网页举例
+    从js文件读取内容
+        审查元素列出js文件
+        寻找可疑文件
+        解析js文件内容
+    构造目标地址
+        根据规律构造
+            页数
+            每页个数
+            其实数
+            其他
+        来自文件
+            id
+            cid
+            vid
+            其他标签
+        手动生成
+            时间戳
+    实战--腾讯视频评论爬虫
+        目标网站：腾讯视频
+        目标网址：http://video.qq.com
+        目标内容：
+            某个视频下面的评论：评论内容、评论人名称、评论时间
+        输出结果保存到MongoDB中
+
